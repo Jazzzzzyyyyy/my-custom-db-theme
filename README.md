@@ -43,26 +43,39 @@ Type: **Chakra Petch** (display) over **IBM Plex Mono** (numbers, logs).
 
 ## Other themes
 
-`build_theme.py` generates a whole asset set from one config block — eight colours
-plus three style knobs (`frame`, `glyph`, `bg`). Seven are defined:
+Seven themes are generated as **independent userscripts** under `themes/`. Each has
+its own name in Tampermonkey, its own settings storage, its own 47 assets and its
+own CSS palette — so you can install several and flip between them.
+
+> **Enable only one at a time.** They all match `duelingbook.com`; two enabled at
+> once will fight over the same DOM nodes. Toggling in the Tampermonkey dashboard
+> takes a second and each script keeps its own settings.
+
+| Theme | Look | Install |
+|---|---|---|
+| `neon-grid` | Synthwave skyline, corner brackets, hard neon | [install](https://raw.githubusercontent.com/Jazzzzzyyyyy/my-custom-db-theme/main/themes/neon-grid/custom-duelingbook.user.js) |
+| `millennium` | Carved sandstone and gold leaf, sun-disc reticles, lapis and carnelian | [install](https://raw.githubusercontent.com/Jazzzzzyyyyy/my-custom-db-theme/main/themes/millennium/custom-duelingbook.user.js) |
+| `blueprint` | Drafting table — dashed zones, dimension ticks, annotation ink | [install](https://raw.githubusercontent.com/Jazzzzzyyyyy/my-custom-db-theme/main/themes/blueprint/custom-duelingbook.user.js) |
+| `terminal` | Corroded industrial — cut corners, hazard amber, patina and rust | [install](https://raw.githubusercontent.com/Jazzzzzyyyyy/my-custom-db-theme/main/themes/terminal/custom-duelingbook.user.js) |
+| `sakura` | Ink-wash twilight — brushed borders, washi ground, gold seal | [install](https://raw.githubusercontent.com/Jazzzzzyyyyy/my-custom-db-theme/main/themes/sakura/custom-duelingbook.user.js) |
+| `void` | Pure black, hairline zones, one accent a side; built for low bitrate | [install](https://raw.githubusercontent.com/Jazzzzzyyyyy/my-custom-db-theme/main/themes/void/custom-duelingbook.user.js) |
+| `arcade` | Phosphor and scanlines, blocky frames, pixel reticles | [install](https://raw.githubusercontent.com/Jazzzzzyyyyy/my-custom-db-theme/main/themes/arcade/custom-duelingbook.user.js) |
+
+The script at the repo root is Neon Grid and updates itself, so if you already run it
+you only need the other six. `themes/neon-grid/` is the same thing regenerated.
+
+### Regenerating
 
 ```
-python3 build_theme.py --list
-python3 build_theme.py millennium assets/    # overwrite the live set
+python3 build_all.py          # all seven, assets + scripts
+python3 build_theme.py --list # what is defined
 ```
 
-| Theme | Look |
-|---|---|
-| `neon-grid` | Synthwave skyline, corner brackets, hard neon *(shipped)* |
-| `millennium` | Carved sandstone and gold leaf, sun-disc reticles, lapis and carnelian |
-| `blueprint` | Drafting table — dashed zones, dimension ticks, annotation ink |
-| `terminal` | Corroded industrial — cut corners, hazard amber, patina and rust |
-| `sakura` | Ink-wash twilight — brushed borders, washi ground, gold seal |
-| `void` | Pure black, hairline zones, one accent a side; built for low bitrate |
-| `arcade` | Phosphor and scanlines, blocky frames, pixel reticles |
-
-Swapping a theme also means updating the palette in `setNeonGridCss()`, since the
-phase buttons, turn indicator, constructor and search panel are CSS, not images.
+A theme is one entry in `THEMES` in `build_theme.py`: eight colours plus three style
+knobs — `frame` (bracket, double, dashed, cut, brush, block), `glyph` (diamond, cross,
+circle, pixel, none) and `bg` (city, rays, grid, flat, paper, scanlines). `build_all.py`
+rewrites each script's asset URLs, metadata and the `NEON_THEME` palette that drives
+the CSS layer, so a new theme needs no hand-editing.
 
 ## Files
 

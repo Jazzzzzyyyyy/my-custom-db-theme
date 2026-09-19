@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Custom DB — Neon Grid
 // @description  Custom DB with the Neon Grid cyberpunk asset pack baked in
-// @version      1.1.71.3
+// @version      1.1.72.0
 // @author       Killburne
 // @license		 MIT
 // @namespace    https://github.com/Jazzzzzyyyyy/my-custom-db-theme
@@ -2664,77 +2664,83 @@ $(document).ready(function() {
     // and search panel as CSS-gradient <div>s. They no longer have <img>
     // children, so setPhaseButtons()/setTurnButton()/goto() write `src` onto
     // elements that ignore it. These components are themed with CSS instead.
+    //
+    // NEON_THEME is rewritten by build_all.py for each generated theme; keep
+    // it on one line so that substitution stays trivial.
+    const NEON_THEME = {"ink":"#05070d","panel":"#0b1424","line":"#22384f","text":"#dceaf7","p1":"#ff2d78","p2":"#00e5ff","a1":"#ffb020","a2":"#39ff88","a1soft":"#ffd98a"};
+
     function setNeonGridCss() {
         const id = 'neonGridCss';
         if (document.getElementById(id)) {
             return;
         }
+        const T = NEON_THEME;
         const style = document.createElement('style');
         style.id = id;
         style.innerText = `
         /* ---- phase buttons ---- */
-        .phase .background { background: linear-gradient(to top, #31506f, #05070d 54%) !important; }
-        .phase .background .background_top { background: linear-gradient(#22384f, #05070d 69%) !important; }
-        .phase .background .background_inner { background: linear-gradient(to top, #1d3350, #05070d) !important; }
-        .phase_inner.blue { background: radial-gradient(circle, rgba(0,229,255,0.22) 43%, rgba(0,229,255,0.06) 63%, #05070d 75%) !important; }
-        .phase_inner.red  { background: radial-gradient(circle, rgba(255,45,120,0.22) 43%, rgba(255,45,120,0.06) 63%, #05070d 75%) !important; }
-        .phase.active .phase_inner.blue { background: radial-gradient(circle, #7df3ff 18%, #00e5ff 48%, #006577 66%, #05070d 78%) !important; box-shadow: 0 0 10px #00e5ff, 0 0 20px rgba(0,229,255,0.55); }
-        .phase.active .phase_inner.red  { background: radial-gradient(circle, #ff8fb6 18%, #ff2d78 48%, #7a0a34 66%, #05070d 78%) !important; box-shadow: 0 0 10px #ff2d78, 0 0 20px rgba(255,45,120,0.55); }
-        .phase span, .phase .gray_txt { color: #8fa6c8 !important; }
+        .phase .background { background: linear-gradient(to top, ${T.line}, ${T.ink} 54%) !important; }
+        .phase .background .background_top { background: linear-gradient(${T.line}, ${T.ink} 69%) !important; }
+        .phase .background .background_inner { background: linear-gradient(to top, ${T.panel}, ${T.ink}) !important; }
+        .phase_inner.blue { background: radial-gradient(circle, ${T.p2}38 43%, ${T.p2}12 63%, ${T.ink} 75%) !important; }
+        .phase_inner.red  { background: radial-gradient(circle, ${T.p1}38 43%, ${T.p1}12 63%, ${T.ink} 75%) !important; }
+        .phase.active .phase_inner.blue { background: radial-gradient(circle, ${T.p2} 20%, ${T.p2} 48%, ${T.p2}55 66%, ${T.ink} 78%) !important; box-shadow: 0 0 10px ${T.p2}, 0 0 20px ${T.p2}8c; }
+        .phase.active .phase_inner.red  { background: radial-gradient(circle, ${T.p1} 20%, ${T.p1} 48%, ${T.p1}55 66%, ${T.ink} 78%) !important; box-shadow: 0 0 10px ${T.p1}, 0 0 20px ${T.p1}8c; }
+        .phase span, .phase .gray_txt { color: ${T.text}99 !important; }
         .phase.active .phase_txt { color: #ffffff !important; text-shadow: 0 0 6px rgba(255,255,255,0.65); }
 
         /* ---- turn indicator ---- */
         #turn .background, #start_turn .background, #end_turn .background {
-            background: linear-gradient(#31506f, #1d3350 29%, #0b1424 63%, #05070d 100%) !important; }
+            background: linear-gradient(${T.line}, ${T.panel} 29%, ${T.ink} 100%) !important; }
         #turn .background_inner, #start_turn .background_inner, #end_turn .background_inner {
-            background: linear-gradient(to top, #22384f, #0b1424 45%, #05070d 100%) !important; }
+            background: linear-gradient(to top, ${T.line}, ${T.panel} 45%, ${T.ink} 100%) !important; }
         #turn .red, #start_turn .red, #end_turn .red {
-            background: radial-gradient(circle, #ff2d78 0%, #b3104b 75%, #05070d 150%) !important;
-            box-shadow: 0 0 8px rgba(255,45,120,0.8); }
+            background: radial-gradient(circle, ${T.p1} 0%, ${T.p1}b0 75%, ${T.ink} 150%) !important;
+            box-shadow: 0 0 8px ${T.p1}cc; }
         #turn .blue, #start_turn .blue, #end_turn .blue {
-            background: radial-gradient(circle, #00e5ff 0%, #0090a6 75%, #05070d 150%) !important;
-            box-shadow: 0 0 8px rgba(0,229,255,0.8); }
+            background: radial-gradient(circle, ${T.p2} 0%, ${T.p2}b0 75%, ${T.ink} 150%) !important;
+            box-shadow: 0 0 8px ${T.p2}cc; }
         #start_turn .green, #end_turn .green {
-            background: radial-gradient(circle, #39ff88 0%, #14a355 75%, #05070d 150%) !important;
-            box-shadow: 0 0 8px rgba(57,255,136,0.8); }
+            background: radial-gradient(circle, ${T.a2} 0%, ${T.a2}b0 75%, ${T.ink} 150%) !important;
+            box-shadow: 0 0 8px ${T.a2}cc; }
         #start_turn .yellow, #end_turn .yellow {
-            background: radial-gradient(circle, #ffb020 0%, #a86c00 75%, #05070d 150%) !important;
-            box-shadow: 0 0 8px rgba(255,176,32,0.8); }
+            background: radial-gradient(circle, ${T.a1} 0%, ${T.a1}b0 75%, ${T.ink} 150%) !important;
+            box-shadow: 0 0 8px ${T.a1}cc; }
 
         /* ---- counters ----
            DuelingBook renders the counter value as .counter .total_txt in black
            with no shadow, which was legible on its own light hexagon but not on
-           the Neon Grid one. */
+           a dark themed one. */
         .counter, .counter .total_txt {
-            color: #ffd98a !important;
+            color: ${T.a1soft} !important;
             font-weight: 700 !important;
-            text-shadow: 0 0 2px #05070d, 0 0 4px #05070d, 0 0 7px #05070d, 0 1px 1px #05070d !important; }
+            text-shadow: 0 0 2px ${T.ink}, 0 0 4px ${T.ink}, 0 0 7px ${T.ink}, 0 1px 1px ${T.ink} !important; }
         .counter:hover .total_txt { color: #ffffff !important; }
 
         /* ---- deck constructor ---- */
-        .deck_bg  { background: rgba(11,20,36,0.90) !important; box-shadow: inset 0 0 0 1px rgba(0,229,255,0.35); }
-        .side_bg  { background: rgba(11,20,36,0.92) !important; box-shadow: inset 0 0 0 1px rgba(0,229,255,0.45); }
-        .extra_bg { background: rgba(11,20,36,0.92) !important; box-shadow: inset 0 0 0 1px rgba(255,176,32,0.55); }
-        .deck_bg .deck_lbl  { color: #dceaf7 !important; }
-        .side_bg .side_lbl  { color: #00e5ff !important; }
-        .extra_bg .extra_lbl { color: #ffb020 !important; }
+        .deck_bg  { background: ${T.panel}e6 !important; box-shadow: inset 0 0 0 1px ${T.p2}59; }
+        .side_bg  { background: ${T.panel}eb !important; box-shadow: inset 0 0 0 1px ${T.p2}73; }
+        .extra_bg { background: ${T.panel}eb !important; box-shadow: inset 0 0 0 1px ${T.a1}8c; }
+        .deck_bg .deck_lbl  { color: ${T.text} !important; }
+        .side_bg .side_lbl  { color: ${T.p2} !important; }
+        .extra_bg .extra_lbl { color: ${T.a1} !important; }
 
         /* ---- card search panel ---- */
-        .search_bg { background: rgba(11,20,36,0.94) !important; box-shadow: inset 0 0 0 1px rgba(0,229,255,0.35); }
+        .search_bg { background: ${T.panel}f0 !important; box-shadow: inset 0 0 0 1px ${T.p2}59; }
 
         /* ---- main menu panels ---- */
         .format > .border, #decklist > .border, #mode > .border,
         #filter > .border, #host_bg > .border, #accept_members_bg > .border {
-            background: rgba(11,20,36,0.92) !important; }
+            background: ${T.panel}eb !important; }
         .format > .border::before, #decklist > .border::before, #mode > .border::before,
         #filter > .border::before, #host_bg > .border::before, #accept_members_bg > .border::before {
-            background: linear-gradient(to right bottom, #00e5ff, #ff2d78) !important; }
-        #online_users .chat_top_bg  { background: linear-gradient(to right, #1d3350, #00e5ff) !important; }
-        #public_chat .chat_top_bg   { background: linear-gradient(to right, #1d3350, #00e5ff) !important; }
-        #private_chat .chat_top_bg  { background: linear-gradient(to right, #1d3350, #39ff88) !important; }
-        #watch_chat .chat_top_bg    { background: linear-gradient(to right, #1d3350, #ff2d78) !important; }
-        #calls .chat_top_bg         { background: linear-gradient(to right, #1d3350, #ffb020) !important; }
-        #duel_log .chat_top_bg      { background: linear-gradient(to right, #1d3350, #ffb020) !important; }
+            background: linear-gradient(to right bottom, ${T.p2}, ${T.p1}) !important; }
+        #online_users .chat_top_bg  { background: linear-gradient(to right, ${T.panel}, ${T.p2}) !important; }
+        #public_chat .chat_top_bg   { background: linear-gradient(to right, ${T.panel}, ${T.p2}) !important; }
+        #private_chat .chat_top_bg  { background: linear-gradient(to right, ${T.panel}, ${T.a2}) !important; }
+        #watch_chat .chat_top_bg    { background: linear-gradient(to right, ${T.panel}, ${T.p1}) !important; }
+        #calls .chat_top_bg         { background: linear-gradient(to right, ${T.panel}, ${T.a1}) !important; }
+        #duel_log .chat_top_bg      { background: linear-gradient(to right, ${T.panel}, ${T.a1}) !important; }
         `;
         document.body.appendChild(style);
     }
