@@ -55,6 +55,19 @@ Type: **Chakra Petch** (display) over **IBM Plex Mono** (numbers, logs).
 
 ## Notes
 
+- **Four components are themed with CSS, not images.** DuelingBook rebuilt the phase
+  buttons, turn indicator, deck constructor and card-search panel as gradient `<div>`s
+  with no `<img>` inside. Custom DB still calls `.attr('src', …)` on them, which now
+  writes to elements that have no `src` — so those settings do nothing on current
+  DuelingBook, whichever URLs you put in them. This fork injects a `setNeonGridCss()`
+  stylesheet instead, targeting the real classes (`.phase_inner.red/.blue`,
+  `.phase.active`, `#turn .red/.blue`, `.deck_bg`, `.side_bg`, `.extra_bg`,
+  `.search_bg`). The matching SVGs still ship, for reference and for anyone on an
+  older build.
+
+  Inert as a result: *Phase Button \** , *Turn Button \** (except Glow), *Deck
+  Constructor Background Image Url*, *Deck Constructor Search Image Url*.
+
 - **Master Rule 3 duels keep DuelingBook's own field art.** MR3 has no Extra Monster
   or Pendulum zones, so the Neon Grid layout would put brackets in the wrong places.
 - **Five files have no settings field** — `cell4`, `cell_sel`, `check`, `radio`, and
