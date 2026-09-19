@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Custom DB — Neon Grid
 // @description  Custom DB with the Neon Grid cyberpunk asset pack baked in
-// @version      1.1.71.2
+// @version      1.1.71.3
 // @author       Killburne
 // @license		 MIT
 // @namespace    https://github.com/Jazzzzzyyyyy/my-custom-db-theme
@@ -2700,6 +2700,16 @@ $(document).ready(function() {
         #start_turn .yellow, #end_turn .yellow {
             background: radial-gradient(circle, #ffb020 0%, #a86c00 75%, #05070d 150%) !important;
             box-shadow: 0 0 8px rgba(255,176,32,0.8); }
+
+        /* ---- counters ----
+           DuelingBook renders the counter value as .counter .total_txt in black
+           with no shadow, which was legible on its own light hexagon but not on
+           the Neon Grid one. */
+        .counter, .counter .total_txt {
+            color: #ffd98a !important;
+            font-weight: 700 !important;
+            text-shadow: 0 0 2px #05070d, 0 0 4px #05070d, 0 0 7px #05070d, 0 1px 1px #05070d !important; }
+        .counter:hover .total_txt { color: #ffffff !important; }
 
         /* ---- deck constructor ---- */
         .deck_bg  { background: rgba(11,20,36,0.90) !important; box-shadow: inset 0 0 0 1px rgba(0,229,255,0.35); }
