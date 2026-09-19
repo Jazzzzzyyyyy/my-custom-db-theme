@@ -43,7 +43,7 @@ Type: **Chakra Petch** (display) over **IBM Plex Mono** (numbers, logs).
 
 ## Other themes
 
-Seven themes are generated as **independent userscripts** under `themes/`. Each has
+Eight themes are generated as **independent userscripts** under `themes/`. Each has
 its own name in Tampermonkey, its own settings storage, its own 47 assets and its
 own CSS palette — so you can install several and flip between them.
 
@@ -59,6 +59,7 @@ own CSS palette — so you can install several and flip between them.
 | `terminal` | Corroded industrial — cut corners, hazard amber, patina and rust | [install](https://raw.githubusercontent.com/Jazzzzzyyyyy/my-custom-db-theme/main/themes/terminal/custom-duelingbook.user.js) |
 | `sakura` | Ink-wash twilight — brushed borders, washi ground, gold seal | [install](https://raw.githubusercontent.com/Jazzzzzyyyyy/my-custom-db-theme/main/themes/sakura/custom-duelingbook.user.js) |
 | `void` | Pure black, hairline zones, one accent a side; built for low bitrate | [install](https://raw.githubusercontent.com/Jazzzzzyyyyy/my-custom-db-theme/main/themes/void/custom-duelingbook.user.js) |
+| `sanctum` | Carved stone plates sunk into a ruined platform, lit from within | [install](https://raw.githubusercontent.com/Jazzzzzyyyyy/my-custom-db-theme/main/themes/sanctum/custom-duelingbook.user.js) |
 | `arcade` | Phosphor and scanlines, blocky frames, pixel reticles | [install](https://raw.githubusercontent.com/Jazzzzzyyyyy/my-custom-db-theme/main/themes/arcade/custom-duelingbook.user.js) |
 
 The script at the repo root is Neon Grid and updates itself, so if you already run it
@@ -67,13 +68,14 @@ you only need the other six. `themes/neon-grid/` is the same thing regenerated.
 ### Regenerating
 
 ```
-python3 build_all.py          # all seven, assets + scripts
+python3 build_all.py          # all eight, assets + scripts
 python3 build_theme.py --list # what is defined
 ```
 
 A theme is one entry in `THEMES` in `build_theme.py`: eight colours plus three style
-knobs — `frame` (bracket, double, dashed, cut, brush, block), `glyph` (diamond, cross,
-circle, pixel, none) and `bg` (city, rays, grid, flat, paper, scanlines). `build_all.py`
+knobs — `frame` (bracket, double, dashed, cut, brush, block, slab), `glyph` (diamond,
+cross, circle, pixel, none) and `bg` (city, rays, grid, flat, paper, scanlines, ruins).
+`build_all.py`
 rewrites each script's asset URLs, metadata and the `NEON_THEME` palette that drives
 the CSS layer, so a new theme needs no hand-editing.
 
@@ -90,6 +92,12 @@ the CSS layer, so a new theme needs no hand-editing.
 - **Chrome** — `cell4.svg`, `cell_sel.svg`, `check.svg`, `radio.svg`, `combobox_arrow.svg`
 
 ## Notes
+
+- **`sanctum` draws its stone platform in `field_zones2.svg`, not the background.**
+  DuelingBook stretches the background image to the browser window while the field
+  stays a fixed 1024&times;640, so anything that has to line up with the grid must live
+  in the field layer. The background carries only void, mist, rubble and motes. Any
+  new theme with ground art should do the same.
 
 - **Four components are themed with CSS, not images.** DuelingBook rebuilt the phase
   buttons, turn indicator, deck constructor and card-search panel as gradient `<div>`s

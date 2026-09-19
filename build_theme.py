@@ -46,6 +46,12 @@ THEMES = {
     ink='#000000', panel='#0a0a0a', line='#242424', text='#ffffff',
     p1='#ff3b3b', p2='#3b8cff', a1='#ffffff', a2='#9a9a9a',
     frame='bracket', glyph='none', lw=1.5, fill=0.0, bg='flat'),
+ 'sanctum': dict(
+    label='Sanctum', blurb='Carved stone plates sunk into a ruined platform, lit from within. Moss, cracks, drifting motes.',
+    ink='#060b10', panel='#101b24', line='#2b4150', text='#e4f1f8',
+    p1='#ff9d6e', p2='#4fd8ff', a1='#ffc46b', a2='#7ce3b0',
+    stone='#7b8b9b', stone2='#33404d', moss='#4f7a4a',
+    frame='slab', glyph='diamond', lw=2.0, fill=0.0, bg='ruins'),
  'arcade': dict(
     label='Arcade CRT', blurb='Phosphor and scanlines. Blocky frames, pixel reticles, cabinet colours.',
     ink='#0b0f0b', panel='#111811', line='#264026', text='#ddffdd',
@@ -63,6 +69,197 @@ def glow_filter(fid, blur=3):
             f'<feGaussianBlur stdDeviation="{blur}" result="b"/><feMerge>'
             f'<feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/>'
             f'</feMerge></filter>')
+
+# ---- carved-stone slab zones + ruin ground (frame='slab', bg='ruins') ------
+
+def _k(T, key, fallback):
+    return T.get(key, fallback)
+
+def zone_defs(T):
+    """Shared gradients/filters a slab field needs, emitted once per file."""
+    if T['frame'] != 'slab':
+        return ''
+    stone, stone2 = _k(T, 'stone', '#6d7d8d'), _k(T, 'stone2', '#333e4a')
+    return (
+        f'<linearGradient id="st" x1="0" y1="0" x2="0.35" y2="1">'
+        f'<stop offset="0" stop-color="{stone}"/><stop offset="0.55" stop-color="{stone2}"/>'
+        f'<stop offset="1" stop-color="{T["ink"]}"/></linearGradient>'
+        f'<linearGradient id="stw" x1="0" y1="0" x2="0.35" y2="1">'
+        f'<stop offset="0" stop-color="{stone}" stop-opacity="0.85"/>'
+        f'<stop offset="1" stop-color="{stone2}" stop-opacity="0.95"/></linearGradient>'
+        f'<linearGradient id="well" x1="0" y1="0" x2="0.2" y2="1">'
+        f'<stop offset="0" stop-color="{T["p2"]}" stop-opacity="0.10"/>'
+        f'<stop offset="1" stop-color="{T["p2"]}" stop-opacity="0.02"/></linearGradient>'
+        + platform_defs(T) + glow_filter('zg', 2.6))
+
+def _moss(x, y, w, h, seed, col):
+    """A few irregular blobs tucked into the plate corners."""
+    out = []
+    for i in range(5):
+        r = (seed * (i + 3) * 37) % 100 / 100.0
+        s = (seed * (i + 7) * 53) % 100 / 100.0
+        px = x + 4 + r * (w - 10)
+        py = y + (4 if i % 2 else h - 9) + s * 4
+        rr = 2.2 + s * 2.6
+        out.append(f'<ellipse cx="{px:.1f}" cy="{py:.1f}" rx="{rr:.1f}" ry="{rr*0.62:.1f}" '
+                   f'fill="{col}" fill-opacity="0.55"/>')
+    return ''.join(out)
+
+def slab_zone(T, x, y, w, h, c, kind='mon', seed=1):
+    glow_c = c
+    moss = _k(T, 'moss', '#4f7a4a')
+    inset = 10
+    ix, iy, iw, ih = x + inset, y + inset, w - inset*2, h - inset*2
+    p = []
+    # cast shadow, so the plate reads as a raised block on the platform
+    p.append(f'<rect x="{x-1.5}" y="{y+2.5}" width="{w+3}" height="{h+3}" rx="8" fill="{T["ink"]}" '
+             f'fill-opacity="0.55"/>')
+    # stone body + bevels
+    p.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="6" fill="url(#st)"/>')
+    p.append(f'<path d="M{x+2.5},{y+h-2.5} V{y+2.5} H{x+w-2.5}" fill="none" stroke="#ffffff" '
+             f'stroke-width="1.6" stroke-opacity="0.16" stroke-linejoin="round"/>')
+    p.append(f'<path d="M{x+2.5},{y+h-2.5} H{x+w-2.5} V{y+2.5}" fill="none" stroke="{T["ink"]}" '
+             f'stroke-width="1.8" stroke-opacity="0.55" stroke-linejoin="round"/>')
+    p.append(f'<rect x="{x+0.75}" y="{y+0.75}" width="{w-1.5}" height="{h-1.5}" rx="6" fill="none" '
+             f'stroke="{T["ink"]}" stroke-width="1.5" stroke-opacity="0.8"/>')
+    # recessed well
+    p.append(f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" rx="4" fill="{T["ink"]}" '
+             f'fill-opacity="0.82"/>')
+    p.append(f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" rx="4" fill="url(#well)"/>')
+    # light well: glowing ring + inner hairline
+    p.append(f'<g filter="url(#zg)"><rect x="{ix+1}" y="{iy+1}" width="{iw-2}" height="{ih-2}" rx="3.5" '
+             f'fill="none" stroke="{glow_c}" stroke-width="2.1" stroke-opacity="0.95"/></g>')
+    p.append(f'<rect x="{ix+5}" y="{iy+5}" width="{iw-10}" height="{ih-10}" rx="2.5" fill="none" '
+             f'stroke="{glow_c}" stroke-width="1" stroke-opacity="0.35"/>')
+    p.append(f'<rect x="{ix+1}" y="{iy+1}" width="{iw-2}" height="{ih-2}" rx="3.5" fill="{glow_c}" '
+             f'fill-opacity="0.07"/>')
+    # corner studs
+    for sx, sy in ((x+5.5, y+5.5), (x+w-5.5, y+5.5), (x+5.5, y+h-5.5), (x+w-5.5, y+h-5.5)):
+        p.append(f'<circle cx="{sx}" cy="{sy}" r="2.3" fill="url(#stw)" stroke="{T["ink"]}" '
+                 f'stroke-width="0.8" stroke-opacity="0.6"/>')
+    # a hairline crack across the stone border
+    cs = (seed * 29) % 4
+    if cs == 0:
+        p.append(f'<path d="M{x+w*0.3},{y} l3,4 l-2,4" fill="none" stroke="{T["ink"]}" '
+                 f'stroke-width="1" stroke-opacity="0.5"/>')
+    elif cs == 1:
+        p.append(f'<path d="M{x+w},{y+h*0.4} l-4,3 l2,4" fill="none" stroke="{T["ink"]}" '
+                 f'stroke-width="1" stroke-opacity="0.5"/>')
+    p.append(_moss(x, y, w, h, seed, moss))
+    # centre mark, sunk into the well
+    cx, cy = x + w/2, y + h/2
+    if kind == 'mon':
+        p.append(f'<path d="M{cx},{cy-7} L{cx+7},{cy} L{cx},{cy+7} L{cx-7},{cy} Z" fill="none" '
+                 f'stroke="{glow_c}" stroke-width="1.2" stroke-opacity="0.45"/>')
+    elif kind == 'deck':
+        p.append(f'<path d="M{cx-8},{cy-11} h16 v20 h-16 Z" fill="none" stroke="{glow_c}" '
+                 f'stroke-width="1.2" stroke-opacity="0.4"/>')
+    return '<g>' + ''.join(p) + '</g>'
+
+
+def ruins_bg(T):
+    """Dark void, a cracked stone platform, floating rubble and low mist."""
+    ink = T['ink']
+    stone, stone2 = _k(T, 'stone', '#6d7d8d'), _k(T, 'stone2', '#333e4a')
+    moss, p2, p1 = _k(T, 'moss', '#4f7a4a'), T['p2'], T['p1']
+    d = (f'<radialGradient id="halo" cx="0.5" cy="0.5" r="0.62">'
+         f'<stop offset="0" stop-color="{p2}" stop-opacity="0.40"/>'
+         f'<stop offset="0.45" stop-color="{p2}" stop-opacity="0.13"/>'
+         f'<stop offset="1" stop-color="{ink}" stop-opacity="0"/></radialGradient>'
+         f'<linearGradient id="plat" x1="0" y1="0" x2="0.2" y2="1">'
+         f'<stop offset="0" stop-color="{stone}" stop-opacity="0.55"/>'
+         f'<stop offset="0.6" stop-color="{stone2}" stop-opacity="0.85"/>'
+         f'<stop offset="1" stop-color="{ink}" stop-opacity="0.95"/></linearGradient>'
+         f'<linearGradient id="mist" x1="0" y1="0" x2="0" y2="1">'
+         f'<stop offset="0" stop-color="{p2}" stop-opacity="0"/>'
+         f'<stop offset="0.6" stop-color="{p2}" stop-opacity="0.11"/>'
+         f'<stop offset="1" stop-color="{p2}" stop-opacity="0.22"/></linearGradient>'
+         + glow_filter('bg1', 9))
+    b = [f'<rect width="1920" height="1080" fill="{ink}"/>',
+         f'<ellipse cx="960" cy="540" rx="900" ry="530" fill="url(#halo)"/>']
+    # NOTE: the stone platform lives in field_zones2.svg, not here. DuelingBook
+    # stretches the background to the WINDOW while the field stays 1024x640, so
+    # anything that must align with the grid has to be in the field layer.
+    # cracks + creeping moss along the seams
+    pass
+    # floating rubble around the platform
+    for i in range(26):
+        s = 18 + (i * 37) % 46
+        ang = (i * 61) % 360
+        import math
+        rad = 780 + (i * 97) % 200
+        x = 960 + rad * math.cos(math.radians(ang)) * 1.05
+        y = 540 + rad * math.sin(math.radians(ang)) * 0.62
+        if -60 < x < 1980 and -60 < y < 1140:
+            rot = (i * 43) % 60 - 30
+            b.append(f'<g transform="translate({x:.0f},{y:.0f}) rotate({rot})">'
+                     f'<rect x="{-s/2:.0f}" y="{-s/2:.0f}" width="{s}" height="{s*0.7:.0f}" '
+                     f'fill="url(#plat)" stroke="{stone2}" stroke-width="1.5" stroke-opacity="0.7"/>'
+                     f'<path d="M{-s/2:.0f},{s*0.35-s/2:.0f} H{s/2:.0f}" stroke="#ffffff" '
+                     f'stroke-width="1" stroke-opacity="0.12"/></g>')
+    # motes of light drifting off the stone
+    for i in range(46):
+        x = (i * 397) % 1920
+        y = (i * 233) % 1080
+        r = 1.5 + (i % 3)
+        b.append(f'<circle cx="{x}" cy="{y}" r="{r}" fill="{p2 if i % 5 else p1}" fill-opacity="0.35"/>')
+    b.append(f'<rect y="700" width="1920" height="380" fill="url(#mist)"/>')
+    b.append(f'<g filter="url(#bg1)"><ellipse cx="960" cy="905" rx="700" ry="52" fill="{p2}" '
+             f'fill-opacity="0.16"/></g>')
+    return svg(1920, 1080, ''.join(b), d)
+
+
+PLATFORM_D = ('M214,14 H826 L850,42 V542 L826,570 H214 L190,542 V42 Z')
+
+def ruins_platform(T):
+    """The stone the grid is carved into. Drawn in field (1024x640) space so it
+    lines up with the zones; the background only supplies void, mist and rubble."""
+    ink = T['ink']
+    stone, stone2 = _k(T, 'stone', '#6d7d8d'), _k(T, 'stone2', '#333e4a')
+    moss = _k(T, 'moss', '#4f7a4a')
+    p = [f'<path d="{PLATFORM_D}" fill="url(#plat2)" stroke="{stone2}" stroke-width="2.5" stroke-opacity="0.9"/>',
+         f'<path d="{PLATFORM_D}" fill="none" stroke="#ffffff" stroke-width="1.2" stroke-opacity="0.13"/>']
+    # flagstone seams, on the same 93px rhythm as the zones
+    for x in (288, 381, 474, 567, 660, 751):
+        p.append(f'<path d="M{x-4.5},16 V568" stroke="{ink}" stroke-width="1.6" stroke-opacity="0.34"/>')
+    for y in (60, 153, 246, 339, 432, 523):
+        p.append(f'<path d="M192,{y-4.5} H848" stroke="{ink}" stroke-width="1.6" stroke-opacity="0.34"/>')
+    # cracks that actually travel, with moss creeping along them
+    cracks = [
+        'M190,120 L246,140 L300,132 L352,158 L404,150',
+        'M850,470 L792,452 L740,466 L690,444',
+        'M520,14 L512,52 L530,88 L516,124',
+        'M214,570 L268,540 L318,548 L366,522',
+        'M626,570 L650,536 L700,540 L744,512 L790,520',
+    ]
+    for i, d in enumerate(cracks):
+        p.append(f'<path d="{d}" fill="none" stroke="{ink}" stroke-width="2.2" stroke-opacity="0.55" '
+                 f'stroke-linecap="round" stroke-linejoin="round"/>')
+        p.append(f'<path d="{d}" fill="none" stroke="{moss}" stroke-width="5" stroke-opacity="0.16" '
+                 f'stroke-linecap="round" stroke-linejoin="round"/>')
+    # moss patches in the corners of the slab
+    for cx, cy, rx in ((206,40,16),(834,40,14),(206,548,15),(834,548,17),(520,20,20),(520,564,22)):
+        p.append(f'<ellipse cx="{cx}" cy="{cy}" rx="{rx}" ry="{rx*0.45:.0f}" fill="{moss}" fill-opacity="0.24"/>')
+    # vignette, then a sigil in each otherwise-bare mid-row bay
+    p.append(f'<path d="{PLATFORM_D}" fill="url(#platv)"/>')
+    for cx in (288 + 45.5, 660 + 45.5):
+        p.append(f'<g opacity="0.16"><circle cx="{cx}" cy="291.5" r="30" fill="none" stroke="{stone}" '
+                 f'stroke-width="2"/><circle cx="{cx}" cy="291.5" r="20" fill="none" stroke="{stone}" '
+                 f'stroke-width="1.2"/><path d="M{cx},261.5 V321.5 M{cx-30},291.5 H{cx+30}" '
+                 f'stroke="{stone}" stroke-width="1.2"/></g>')
+    return ''.join(p)
+
+
+def platform_defs(T):
+    stone, stone2 = _k(T, 'stone', '#6d7d8d'), _k(T, 'stone2', '#333e4a')
+    return (f'<linearGradient id="plat2" x1="0" y1="0" x2="0.25" y2="1">'
+            f'<stop offset="0" stop-color="{stone2}"/>'
+            f'<stop offset="0.6" stop-color="{stone2}" stop-opacity="0.85"/>'
+            f'<stop offset="1" stop-color="{T["ink"]}"/></linearGradient>'
+            f'<radialGradient id="platv" cx="0.5" cy="0.5" r="0.72">'
+            f'<stop offset="0.45" stop-color="{T["ink"]}" stop-opacity="0"/>'
+            f'<stop offset="1" stop-color="{T["ink"]}" stop-opacity="0.55"/></radialGradient>')
+
 
 def frame_paths(T, x, y, w, h, c):
     """The zone outline, per the theme's frame style."""
@@ -123,6 +320,8 @@ def glyph_mark(T, cx, cy, c):
     return ''
 
 def zone(T, x, y, w, h, c, kind='mon'):
+    if T['frame'] == 'slab':
+        return slab_zone(T, x, y, w, h, c, kind, seed=int(abs(x) + abs(y)) % 97 + 1)
     cx, cy = x + w/2, y + h/2
     parts = []
     if T['fill'] > 0:
@@ -192,6 +391,8 @@ def background(T):
              f'<rect width="1920" height="1080" fill="{ink}"/>'
              f'<rect width="1920" height="1080" fill="url(#v)"/>{lines}')
         return svg(1920, 1080, b)
+    if T['bg'] == 'ruins':
+        return ruins_bg(T)
     if T['bg'] == 'city':
         return _city(T)
     # flat
@@ -255,6 +456,8 @@ COLS = [288, 381, 474, 567, 660]
 def field_zones(T):
     p1, p2 = T['p1'], T['p2']
     parts = []
+    if T['frame'] == 'slab':
+        parts.append(ruins_platform(T))
     for x in COLS:
         parts.append(zone(T, x, 60, 91, 91, p2, 'st'))
         parts.append(zone(T, x, 153, 91, 91, p2, 'mon'))
@@ -268,13 +471,14 @@ def field_zones(T):
     parts.append(zone(T, 753.5, 339, 64, 91, p1, 'st'))
     parts.append(zone(T, 207, 246, 64, 91, p2, 'mon'))
     parts.append(zone(T, 769, 246, 64, 91, p1, 'mon'))
-    return svg(1024, 640, ''.join(parts))
+    return svg(1024, 640, ''.join(parts), zone_defs(T))
 
 def field_decks(T):
     p1, p2 = T['p1'], T['p2']
     return svg(1024, 640, ''.join([
         zone(T, 207, 28.5, 64, 91, p2, 'deck'), zone(T, 768, 28.5, 64, 91, p2, 'deck'),
-        zone(T, 207, 463.5, 64, 91, p1, 'deck'), zone(T, 768, 463.5, 64, 91, p1, 'deck')]))
+        zone(T, 207, 463.5, 64, 91, p1, 'deck'), zone(T, 768, 463.5, 64, 91, p1, 'deck')]),
+        zone_defs(T))
 
 # ------------------------------- chrome ------------------------------------
 def lamp(T, c, lit):
