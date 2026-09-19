@@ -41,6 +41,29 @@ Then gear → **Import Settings** → pick `custom-db-settings.json` → Save.
 
 Type: **Chakra Petch** (display) over **IBM Plex Mono** (numbers, logs).
 
+## Other themes
+
+`build_theme.py` generates a whole asset set from one config block — eight colours
+plus three style knobs (`frame`, `glyph`, `bg`). Seven are defined:
+
+```
+python3 build_theme.py --list
+python3 build_theme.py millennium assets/    # overwrite the live set
+```
+
+| Theme | Look |
+|---|---|
+| `neon-grid` | Synthwave skyline, corner brackets, hard neon *(shipped)* |
+| `millennium` | Carved sandstone and gold leaf, sun-disc reticles, lapis and carnelian |
+| `blueprint` | Drafting table — dashed zones, dimension ticks, annotation ink |
+| `terminal` | Corroded industrial — cut corners, hazard amber, patina and rust |
+| `sakura` | Ink-wash twilight — brushed borders, washi ground, gold seal |
+| `void` | Pure black, hairline zones, one accent a side; built for low bitrate |
+| `arcade` | Phosphor and scanlines, blocky frames, pixel reticles |
+
+Swapping a theme also means updating the palette in `setNeonGridCss()`, since the
+phase buttons, turn indicator, constructor and search panel are CSS, not images.
+
 ## Files
 
 - **Field** — `field_zones2.svg`, `field_decks2.svg`, `background.svg`, `laser_sword.svg`
