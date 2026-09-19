@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Custom DB — Sakura Dusk
 // @description  Custom DB themed with the Sakura Dusk asset pack — Ink-wash twilight. Brushed borders, washi ground, gold seal.
-// @version      1.1.72.0
+// @version      1.1.72.1
 // @author       Killburne
 // @license		 MIT
 // @namespace    https://github.com/Jazzzzzyyyyy/my-custom-db-theme#sakura
@@ -2667,7 +2667,7 @@ $(document).ready(function() {
     //
     // NEON_THEME is rewritten by build_all.py for each generated theme; keep
     // it on one line so that substitution stays trivial.
-    const NEON_THEME = {"ink":"#171426","panel":"#221d38","line":"#4a4166","text":"#f6ecf2","p1":"#f0a6c8","p2":"#7fb3d9","a1":"#e8c98a","a2":"#c9a227","a1soft":"#f2e1be"};
+    const NEON_THEME = {"ink":"#171426","panel":"#221d38","line":"#4a4166","text":"#f6ecf2","p1":"#f0a6c8","p2":"#7fb3d9","a1":"#e8c98a","a2":"#c9a227","a1soft":"#f2e1be","dim1":"#755b7f","dim2":"#575e83"};
 
     function setNeonGridCss() {
         const id = 'neonGridCss';
@@ -2682,8 +2682,8 @@ $(document).ready(function() {
         .phase .background { background: linear-gradient(to top, ${T.line}, ${T.ink} 54%) !important; }
         .phase .background .background_top { background: linear-gradient(${T.line}, ${T.ink} 69%) !important; }
         .phase .background .background_inner { background: linear-gradient(to top, ${T.panel}, ${T.ink}) !important; }
-        .phase_inner.blue { background: radial-gradient(circle, ${T.p2}38 43%, ${T.p2}12 63%, ${T.ink} 75%) !important; }
-        .phase_inner.red  { background: radial-gradient(circle, ${T.p1}38 43%, ${T.p1}12 63%, ${T.ink} 75%) !important; }
+        .phase_inner.blue { background: radial-gradient(circle, ${T.dim2} 40%, ${T.dim2}b0 62%, ${T.ink} 76%) !important; }
+        .phase_inner.red  { background: radial-gradient(circle, ${T.dim1} 40%, ${T.dim1}b0 62%, ${T.ink} 76%) !important; }
         .phase.active .phase_inner.blue { background: radial-gradient(circle, ${T.p2} 20%, ${T.p2} 48%, ${T.p2}55 66%, ${T.ink} 78%) !important; box-shadow: 0 0 10px ${T.p2}, 0 0 20px ${T.p2}8c; }
         .phase.active .phase_inner.red  { background: radial-gradient(circle, ${T.p1} 20%, ${T.p1} 48%, ${T.p1}55 66%, ${T.ink} 78%) !important; box-shadow: 0 0 10px ${T.p1}, 0 0 20px ${T.p1}8c; }
         .phase span, .phase .gray_txt { color: ${T.text}99 !important; }

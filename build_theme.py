@@ -128,11 +128,11 @@ def slab_zone(T, x, y, w, h, c, kind='mon', seed=1):
     p.append(f'<rect x="{ix}" y="{iy}" width="{iw}" height="{ih}" rx="4" fill="url(#well)"/>')
     # light well: glowing ring + inner hairline
     p.append(f'<g filter="url(#zg)"><rect x="{ix+1}" y="{iy+1}" width="{iw-2}" height="{ih-2}" rx="3.5" '
-             f'fill="none" stroke="{glow_c}" stroke-width="2.1" stroke-opacity="0.95"/></g>')
+             f'fill="none" stroke="{glow_c}" stroke-width="1.7" stroke-opacity="0.55"/></g>')
     p.append(f'<rect x="{ix+5}" y="{iy+5}" width="{iw-10}" height="{ih-10}" rx="2.5" fill="none" '
-             f'stroke="{glow_c}" stroke-width="1" stroke-opacity="0.35"/>')
+             f'stroke="{glow_c}" stroke-width="1" stroke-opacity="0.20"/>')
     p.append(f'<rect x="{ix+1}" y="{iy+1}" width="{iw-2}" height="{ih-2}" rx="3.5" fill="{glow_c}" '
-             f'fill-opacity="0.07"/>')
+             f'fill-opacity="0.04"/>')
     # corner studs
     for sx, sy in ((x+5.5, y+5.5), (x+w-5.5, y+5.5), (x+5.5, y+h-5.5), (x+w-5.5, y+h-5.5)):
         p.append(f'<circle cx="{sx}" cy="{sy}" r="2.3" fill="url(#stw)" stroke="{T["ink"]}" '
@@ -150,7 +150,7 @@ def slab_zone(T, x, y, w, h, c, kind='mon', seed=1):
     cx, cy = x + w/2, y + h/2
     if kind == 'mon':
         p.append(f'<path d="M{cx},{cy-7} L{cx+7},{cy} L{cx},{cy+7} L{cx-7},{cy} Z" fill="none" '
-                 f'stroke="{glow_c}" stroke-width="1.2" stroke-opacity="0.45"/>')
+                 f'stroke="{glow_c}" stroke-width="1.2" stroke-opacity="0.30"/>')
     elif kind == 'deck':
         p.append(f'<path d="M{cx-8},{cy-11} h16 v20 h-16 Z" fill="none" stroke="{glow_c}" '
                  f'stroke-width="1.2" stroke-opacity="0.4"/>')
@@ -700,11 +700,24 @@ def _lighten(hexcolor, amt=0.45):
     return '#%02x%02x%02x' % (f(r), f(g), f(b))
 
 
+def _mix(a, b, t):
+    """Blend hex a toward hex b by t (0..1)."""
+    ah, bh = a.lstrip('#'), b.lstrip('#')
+    ch = lambda h, i: int(h[i:i+2], 16)
+    return '#%02x%02x%02x' % tuple(
+        int(ch(ah, i) * (1 - t) + ch(bh, i) * t) for i in (0, 2, 4))
+
+
 def theme_palette(name):
     """The palette the userscript's CSS layer needs, as a JSON-ready dict."""
     T = THEMES[name]
     p = {k: T[k] for k in ('ink', 'panel', 'line', 'text', 'p1', 'p2', 'a1', 'a2')}
     p['a1soft'] = T.get('a1soft', _lighten(T['a1']))
+    # Unlit phase lamps: mostly the theme's own slate, with just enough of the
+    # player colour left to tell the sides apart. A straight low-alpha tint of a
+    # warm p1 over near-black reads as mud, which is what Sanctum exposed.
+    p['dim1'] = _mix(T['p1'], T['line'], 0.74)
+    p['dim2'] = _mix(T['p2'], T['line'], 0.74)
     return p
 
 
